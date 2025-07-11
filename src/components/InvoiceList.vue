@@ -22,7 +22,8 @@
         </div>
       </div>
       
-      <div class="table-responsive">
+      <!-- Desktop Table View -->
+      <div class="table-responsive desktop-view">
         <table class="table">
           <thead>
             <tr>
@@ -71,6 +72,67 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      
+      <!-- Mobile Card View -->
+      <div class="mobile-view">
+        <div class="invoice-cards">
+          <div 
+            v-for="invoice in filteredInvoices" 
+            :key="invoice.id"
+            class="invoice-card"
+          >
+            <div class="card-header">
+              <div class="card-title">
+                <h4>Invoice #{{ invoice.invoice_number }}</h4>
+                <span class="status-badge" :class="getStatusClass(invoice)">
+                  {{ invoice.status }}
+                </span>
+              </div>
+              <div class="card-amount">
+                ${{ (Number(invoice.total_amount) || 0).toFixed(2) }}
+              </div>
+            </div>
+            
+            <div class="card-details">
+              <div class="detail-item">
+                <span class="detail-label">Client:</span>
+                <span class="detail-value">{{ invoice.client_name }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date:</span>
+                <span class="detail-value">{{ formatDate(invoice.invoice_date) }}</span>
+              </div>
+            </div>
+            
+            <div class="card-actions">
+              <button
+                @click="viewInvoice(invoice)"
+                class="btn btn-secondary btn-mobile"
+                title="View Invoice"
+              >
+                <span class="btn-icon">👁️</span>
+                <span class="btn-text">View</span>
+              </button>
+              <button
+                @click="editInvoice(invoice)"
+                class="btn btn-primary btn-mobile"
+                title="Edit Invoice"
+              >
+                <span class="btn-icon">✏️</span>
+                <span class="btn-text">Edit</span>
+              </button>
+              <button
+                @click="deleteInvoice(invoice)"
+                class="btn btn-danger btn-mobile"
+                title="Delete Invoice"
+              >
+                <span class="btn-icon">🗑️</span>
+                <span class="btn-text">Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -280,25 +342,35 @@ export default {
 
 .empty-state {
   text-align: center;
-  padding: 3rem;
+  padding: 3rem 1rem;
   background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin: 1rem 0;
 }
 
 .empty-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
 }
 
 .empty-state h3 {
   margin-bottom: 0.5rem;
   color: #2c3e50;
+  font-size: 1.5rem;
 }
 
 .empty-state p {
   color: #6c757d;
   margin-bottom: 1.5rem;
+  font-size: 1.1rem;
 }
 
 .list-header {
@@ -308,15 +380,28 @@ export default {
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 1rem;
+  padding: 0 0.5rem;
 }
 
 .list-header h3 {
   margin: 0;
   color: #2c3e50;
+  font-size: 1.5rem;
 }
 
 .search-input {
   max-width: 300px;
+  border-radius: 0.7rem;
+  border: 2px solid #e3e9f7;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #5c6bc0;
+  box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.1);
 }
 
 .amount {
@@ -329,6 +414,7 @@ export default {
   border-radius: 1rem;
   font-size: 0.875rem;
   font-weight: 500;
+  text-transform: capitalize;
 }
 
 .status-recent {
@@ -382,6 +468,155 @@ export default {
   min-width: auto;
 }
 
+/* Desktop Table Styles */
+.desktop-view {
+  display: block;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.table th {
+  background: linear-gradient(135deg, #1a237e 0%, #5c6bc0 100%);
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f3f4;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* Mobile Card Styles */
+.mobile-view {
+  display: none;
+}
+
+.invoice-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.invoice-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f1f3f4;
+  transition: all 0.3s ease;
+}
+
+.invoice-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.card-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.card-title h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.card-amount {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #28a745;
+  text-align: right;
+}
+
+.card-details {
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-mobile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.7rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+.btn-icon {
+  font-size: 1rem;
+}
+
+.btn-text {
+  display: block;
+}
+
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
@@ -399,11 +634,12 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   max-width: 600px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
@@ -412,25 +648,35 @@ export default {
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid #dee2e6;
+  background: linear-gradient(135deg, #1a237e 0%, #5c6bc0 100%);
+  color: white;
+  border-radius: 1rem 1rem 0 0;
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: white;
+  font-size: 1.3rem;
 }
 
 .modal-close {
-  background: none;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #6c757d;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+  color: white;
+  padding: 0.5rem;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .modal-body {
@@ -444,7 +690,7 @@ export default {
 .detail-row {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
   border-bottom: 1px solid #f8f9fa;
 }
 
@@ -464,19 +710,21 @@ export default {
 .invoice-items h4 {
   margin-bottom: 1rem;
   color: #2c3e50;
+  font-size: 1.2rem;
 }
 
 .items-table {
   border: 1px solid #dee2e6;
-  border-radius: 0.375rem;
+  border-radius: 0.7rem;
   overflow: hidden;
+  background: white;
 }
 
 .item-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   background: #f8f9fa;
-  padding: 0.75rem;
+  padding: 1rem;
   font-weight: 600;
   color: #495057;
 }
@@ -484,13 +732,20 @@ export default {
 .item-row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
-  padding: 0.75rem;
+  padding: 1rem;
   border-top: 1px solid #dee2e6;
+}
+
+.item-row:nth-child(even) {
+  background: #f8f9fa;
 }
 
 .invoice-summary {
   text-align: right;
   margin-bottom: 2rem;
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 0.7rem;
 }
 
 .summary-row {
@@ -498,7 +753,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .summary-row:last-child {
@@ -512,6 +767,10 @@ export default {
   padding-top: 0.5rem;
 }
 
+.total-amount {
+  font-size: 1.4rem;
+}
+
 .invoice-notes {
   border-top: 1px solid #dee2e6;
   padding-top: 1rem;
@@ -520,11 +779,16 @@ export default {
 .invoice-notes h4 {
   margin-bottom: 0.5rem;
   color: #2c3e50;
+  font-size: 1.2rem;
 }
 
 .invoice-notes p {
   color: #6c757d;
   line-height: 1.6;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.7rem;
+  margin: 0;
 }
 
 .modal-footer {
@@ -533,10 +797,12 @@ export default {
   gap: 1rem;
   padding: 1.5rem;
   border-top: 1px solid #dee2e6;
+  background: #f8f9fa;
+  border-radius: 0 0 1rem 1rem;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
   .list-header {
     flex-direction: column;
     align-items: stretch;
@@ -554,16 +820,77 @@ export default {
     flex-direction: column;
     gap: 0.25rem;
   }
+}
+
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+  
+  .list-header {
+    padding: 0;
+  }
+  
+  .list-header h3 {
+    font-size: 1.3rem;
+  }
+  
+  .search-input {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+  }
+  
+  .invoice-card {
+    padding: 1.25rem;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .card-amount {
+    align-self: flex-end;
+    font-size: 1.2rem;
+  }
+  
+  .card-actions {
+    flex-direction: column;
+  }
+  
+  .btn-mobile {
+    flex-direction: row;
+    justify-content: center;
+  }
   
   .modal-content {
-    margin: 1rem;
-    max-height: calc(100vh - 2rem);
+    margin: 0.5rem;
+    max-height: calc(100vh - 1rem);
+  }
+  
+  .modal-header {
+    padding: 1rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .modal-footer {
+    padding: 1rem;
+    flex-direction: column;
   }
   
   .item-header,
   .item-row {
     grid-template-columns: 1fr;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    padding: 0.75rem;
   }
   
   .item-header span,
@@ -576,6 +903,102 @@ export default {
     content: attr(data-label) ': ';
     font-weight: 600;
     color: #495057;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+  
+  .summary-row {
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .empty-state {
+    padding: 2rem 1rem;
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+  }
+  
+  .empty-state h3 {
+    font-size: 1.3rem;
+  }
+  
+  .empty-state p {
+    font-size: 1rem;
+  }
+  
+  .list-header h3 {
+    font-size: 1.2rem;
+  }
+  
+  .invoice-card {
+    padding: 1rem;
+  }
+  
+  .card-title h4 {
+    font-size: 1.1rem;
+  }
+  
+  .card-amount {
+    font-size: 1.1rem;
+  }
+  
+  .btn-mobile {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .btn-icon {
+    font-size: 0.9rem;
+  }
+  
+  .modal-content {
+    margin: 0.25rem;
+    max-height: calc(100vh - 0.5rem);
+  }
+  
+  .modal-header {
+    padding: 0.75rem;
+  }
+  
+  .modal-body {
+    padding: 0.75rem;
+  }
+  
+  .modal-footer {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .invoice-card {
+    padding: 0.75rem;
+  }
+  
+  .card-title h4 {
+    font-size: 1rem;
+  }
+  
+  .card-amount {
+    font-size: 1rem;
+  }
+  
+  .btn-mobile {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-text {
+    font-size: 0.8rem;
   }
 }
 </style> 

@@ -7,11 +7,48 @@
         </router-link>
       </div>
       
-      <div v-if="!landing" class="navbar-menu" :class="{ 'active': isMenuOpen }">
+      <!-- Mobile Menu Toggle -->
+      <div class="navbar-toggle" @click="toggleMenu" :class="{ 'active': isMenuOpen }">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      
+      <!-- Desktop Menu -->
+      <div v-if="!landing" class="navbar-menu desktop-menu" :class="{ 'active': isMenuOpen }">
         <router-link v-if="isAuthenticated" to="/dashboard" class="nav-link" @click="closeMenu">Home</router-link>
         <router-link v-if="isAuthenticated" to="/create" class="nav-link" @click="closeMenu">Create Invoice</router-link>
         <router-link v-if="isAuthenticated" to="/invoices" class="nav-link" @click="closeMenu">Invoices</router-link>
         <router-link v-if="isAuthenticated" to="/history" class="nav-link" @click="closeMenu">History</router-link>
+      </div>
+      
+      <!-- Mobile Menu Overlay -->
+      <div v-if="!landing && isMenuOpen" class="mobile-menu-overlay" @click="closeMenu"></div>
+      
+      <!-- Mobile Menu -->
+      <div v-if="!landing" class="mobile-menu" :class="{ 'active': isMenuOpen }">
+        <div class="mobile-menu-header">
+          <span class="mobile-menu-title">Menu</span>
+          <button class="mobile-menu-close" @click="closeMenu">×</button>
+        </div>
+        <div class="mobile-menu-links">
+          <router-link v-if="isAuthenticated" to="/dashboard" class="mobile-nav-link" @click="closeMenu">
+            <span class="mobile-nav-icon">🏠</span>
+            Home
+          </router-link>
+          <router-link v-if="isAuthenticated" to="/create" class="mobile-nav-link" @click="closeMenu">
+            <span class="mobile-nav-icon">➕</span>
+            Create Invoice
+          </router-link>
+          <router-link v-if="isAuthenticated" to="/invoices" class="mobile-nav-link" @click="closeMenu">
+            <span class="mobile-nav-icon">📄</span>
+            Invoices
+          </router-link>
+          <router-link v-if="isAuthenticated" to="/history" class="mobile-nav-link" @click="closeMenu">
+            <span class="mobile-nav-icon">📊</span>
+            History
+          </router-link>
+        </div>
       </div>
       
       <div class="navbar-auth">
@@ -36,12 +73,6 @@
             </button>
           </div>
         </div>
-      </div>
-      
-      <div class="navbar-toggle" @click="toggleMenu">
-        <span></span>
-        <span></span>
-        <span></span>
       </div>
     </div>
   </nav>
@@ -146,11 +177,15 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .navbar-brand {
   display: flex;
   align-items: center;
+  z-index: 1002;
 }
 
 .logo {
@@ -226,6 +261,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 1rem;
+  z-index: 1002;
 }
 
 .auth-buttons {
@@ -370,26 +406,282 @@ export default {
   font-size: 1.1rem;
 }
 
+/* Mobile Menu Toggle */
 .navbar-toggle {
   display: none;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1002;
+  transition: all 0.3s ease;
 }
 
-@media (max-width: 900px) {
+.navbar-toggle span {
+  width: 25px;
+  height: 3px;
+  background: #fff;
+  margin: 3px 0;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.navbar-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.navbar-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a237e 0%, #5c6bc0 100%);
+  z-index: 1001;
+  transition: right 0.3s ease;
+  box-shadow: -4px 0 24px rgba(30, 34, 90, 0.2);
+  overflow-y: auto;
+}
+
+.mobile-menu.active {
+  right: 0;
+}
+
+.mobile-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu-title {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.mobile-menu-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background 0.2s;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu-links {
+  padding: 1rem 0;
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  color: #e3e9f7;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link.router-link-active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-left-color: #ffd700;
+  transform: translateX(5px);
+}
+
+.mobile-nav-icon {
+  font-size: 1.3rem;
+  width: 24px;
+  text-align: center;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+  .navbar .container {
+    padding: 1rem 1.5rem;
+  }
+  
+  .navbar-menu {
+    gap: 1.5rem;
+  }
+  
+  .nav-link {
+    padding: 0.5rem 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 1024px) {
   .navbar .container {
     padding: 1rem;
   }
+  
   .navbar-menu {
     gap: 1rem;
   }
+  
+  .nav-link {
+    padding: 0.5rem 0.8rem;
+    font-size: 1rem;
+  }
+  
+  .logo {
+    font-size: 2rem;
+  }
+  
+  .user-name {
+    font-size: 1rem;
+  }
 }
-@media (max-width: 700px) {
-  .navbar-menu {
+
+@media (max-width: 768px) {
+  .navbar .container {
+    padding: 0.8rem 1rem;
+  }
+  
+  .desktop-menu {
     display: none;
   }
+  
   .navbar-toggle {
-    display: block;
-    cursor: pointer;
-    margin-left: 1rem;
+    display: flex;
+  }
+  
+  .logo {
+    font-size: 1.8rem;
+  }
+  
+  .auth-buttons {
+    gap: 0.5rem;
+  }
+  
+  .btn-outline,
+  .btn-primary {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .user-info {
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .user-avatar {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1.1rem;
+  }
+  
+  .user-name {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar .container {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .logo {
+    font-size: 1.6rem;
+  }
+  
+  .auth-buttons {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .btn-outline,
+  .btn-primary {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .user-info {
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .user-avatar {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+  
+  .user-name {
+    display: none;
+  }
+  
+  .mobile-menu {
+    width: 280px;
+    right: -280px;
+  }
+}
+
+@media (max-width: 360px) {
+  .navbar .container {
+    padding: 0.5rem 0.6rem;
+  }
+  
+  .logo {
+    font-size: 1.4rem;
+  }
+  
+  .auth-buttons {
+    gap: 0.2rem;
+  }
+  
+  .btn-outline,
+  .btn-primary {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  
+  .mobile-menu {
+    width: 260px;
+    right: -260px;
   }
 }
 </style> 
