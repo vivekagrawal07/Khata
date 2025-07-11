@@ -1,20 +1,20 @@
 <template>
   <nav class="navbar">
     <div class="container">
-      <div class="navbar-brand">
-        <router-link :to="isAuthenticated ? '/dashboard' : '/'" class="logo">
-          <span class="logo-text">khata</span>
-        </router-link>
-      </div>
-      
-      <!-- Mobile Menu Toggle -->
+      <!-- Mobile Menu Toggle - Leftmost position -->
       <div class="navbar-toggle" @click="toggleMenu" :class="{ 'active': isMenuOpen }">
         <span></span>
         <span></span>
         <span></span>
       </div>
       
-      <!-- Desktop Menu -->
+      <div class="navbar-brand">
+        <router-link :to="isAuthenticated ? '/dashboard' : '/'" class="logo">
+          <span class="logo-text">khata</span>
+        </router-link>
+      </div>
+      
+   <!-- Desktop Menu -->
       <div v-if="!landing" class="navbar-menu desktop-menu" :class="{ 'active': isMenuOpen }">
         <router-link v-if="isAuthenticated" to="/dashboard" class="nav-link" @click="closeMenu">Home</router-link>
         <router-link v-if="isAuthenticated" to="/create" class="nav-link" @click="closeMenu">Create Invoice</router-link>
@@ -406,7 +406,7 @@ export default {
   font-size: 1.1rem;
 }
 
-/* Mobile Menu Toggle */
+/* Mobile Menu Toggle - Leftmost position */
 .navbar-toggle {
   display: none;
   flex-direction: column;
@@ -414,6 +414,7 @@ export default {
   padding: 0.5rem;
   z-index: 1002;
   transition: all 0.3s ease;
+  order: -1; /* Move to leftmost position */
 }
 
 .navbar-toggle span {
@@ -459,18 +460,18 @@ export default {
 .mobile-menu {
   position: fixed;
   top: 0;
-  right: -300px;
+  left: -300px; /* Changed from right to left */
   width: 300px;
   height: 100vh;
   background: linear-gradient(135deg, #1a237e 0%, #5c6bc0 100%);
   z-index: 1001;
-  transition: right 0.3s ease;
-  box-shadow: -4px 0 24px rgba(30, 34, 90, 0.2);
+  transition: left 0.3s ease; /* Changed from right to left */
+  box-shadow: 4px 0 24px rgba(30, 34, 90, 0.2); /* Changed shadow direction */
   overflow-y: auto;
 }
 
 .mobile-menu.active {
-  right: 0;
+  left: 0; /* Changed from right to left */
 }
 
 .mobile-menu-header {
@@ -578,6 +579,42 @@ export default {
   }
 }
 
+/* Tablet Optimization - Keep desktop menu but reduce sizes */
+@media (max-width: 900px) {
+  .navbar .container {
+    padding: 0.8rem 1rem;
+  }
+  
+  .navbar-menu {
+    gap: 0.8rem;
+  }
+  
+  .nav-link {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.95rem;
+  }
+  
+  .logo {
+    font-size: 1.8rem;
+  }
+  
+  .user-name {
+    font-size: 0.9rem;
+  }
+  
+  .user-avatar {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1.1rem;
+  }
+  
+  .btn-outline,
+  .btn-primary {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 768px) {
   .navbar .container {
     padding: 0.8rem 1rem;
@@ -656,7 +693,7 @@ export default {
   
   .mobile-menu {
     width: 280px;
-    right: -280px;
+    left: -280px; /* Changed from right to left */
   }
 }
 
@@ -681,7 +718,7 @@ export default {
   
   .mobile-menu {
     width: 260px;
-    right: -260px;
+    left: -260px; /* Changed from right to left */
   }
 }
 </style> 
